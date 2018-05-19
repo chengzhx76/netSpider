@@ -2,6 +2,7 @@ package com.github.chengzhx76;
 
 
 import com.github.chengzhx76.util.Constant.*;
+import com.github.chengzhx76.util.HttpConstant.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -53,8 +54,9 @@ public class Request implements Serializable {
     public Request() {
     }
 
-    public Request(String url, String type) {
+    public Request(String url, String method, String type) {
         this.url = url;
+        this.method = method;
         this.type = type;
     }
 
@@ -62,16 +64,24 @@ public class Request implements Serializable {
         this.url = url;
     }
 
-    public static Request createTypeRequest(String url, String type) {
-        return new Request(url, type);
+    public static Request createTypeRequest(String url, String method, String type) {
+        return new Request(url, method, type);
     }
 
     public static Request createMediaRequest(String url) {
-        return new Request(url, Type.MEDIA);
+        return createTypeRequest(url, Method.GET, Type.MEDIA);
     }
 
-    public static Request createHtmlRequest(String url) {
-        return new Request(url, Type.HTML);
+    public static Request createHtmlGetRequest(String url) {
+        return createTypeRequest(url, Method.GET, Type.HTML);
+    }
+
+    public static Request createJsonGetRequest(String url) {
+        return createTypeRequest(url, Method.GET, Type.JSON);
+    }
+
+    public static Request createJsonPostRequest(String url) {
+        return createTypeRequest(url, Method.POST, Type.JSON);
     }
 
     public String getUrl() {

@@ -84,6 +84,8 @@ public class HttpClientDownloader implements Downloader {
     private Response handleResponse(HttpResponse httpResponse, Site site, Request request) throws IOException {
         Response response = new Response();
         byte[] bytes = IOUtils.toByteArray(httpResponse.getEntity().getContent());
+        // TODO判断是否是资源
+
         response.setContent(bytes);
         response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
         response.setRawText(new PlainText(new String(bytes, request.getCharset() != null ? request.getCharset() : site.getCharset())));

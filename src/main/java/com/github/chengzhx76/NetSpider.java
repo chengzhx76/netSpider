@@ -1,5 +1,6 @@
 package com.github.chengzhx76;
 
+import com.alibaba.fastjson.JSON;
 import com.github.chengzhx76.download.Downloader;
 import com.github.chengzhx76.download.HttpClientDownloader;
 import com.github.chengzhx76.pipeline.ConsolePipeline;
@@ -73,6 +74,8 @@ public class NetSpider implements Runnable, Task {
 
     private boolean exitWhenComplete = true;
 
+    private boolean spawnUrl = true;
+
     private ReentrantLock newUrlLock = new ReentrantLock();
 
     private Condition newUrlCondition = newUrlLock.newCondition();
@@ -124,6 +127,12 @@ public class NetSpider implements Runnable, Task {
         return this;
     }
 
+    public NetSpider startRequest(Request request) {
+        checkIfRunning();
+        List<Request> requests = new ArrayList<>();
+        requests.add(request);
+        return startRequest(requests);
+    }
     public NetSpider startRequest(List<Request> requests) {
         checkIfRunning();
         this.startRequests = requests;
@@ -288,6 +297,7 @@ public class NetSpider implements Runnable, Task {
     private void onDownloadSuccess(Request request, Response response) {
         if (site.getAcceptStatCode().contains(response.getStatusCode())){
             processor.process(response);
+            extractAndAddRequests(response, spawnUrl);
             if (!response.getResultItems().isSkip()) {
                 for (Pipeline pipeline : pipelines) {
                     pipeline.process(response.getResultItems(), this);
@@ -320,6 +330,14 @@ public class NetSpider implements Runnable, Task {
             }
         }
         sleep(site.getRetrySleepTime());
+    }
+
+    protected void extractAndAddRequests(Response response, boolean spawnUrl) {
+        if (spawnUrl && !response.getTargetRequests().isEmpty()) {
+            for (Request request : response.getTargetRequests()) {
+                addRequest(request);
+            }
+        }
     }
 
     private void signalNewUrl() {

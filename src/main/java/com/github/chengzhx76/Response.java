@@ -1,7 +1,6 @@
 package com.github.chengzhx76;
 
 import com.github.chengzhx76.selector.Selectable;
-import com.github.chengzhx76.util.Constant;
 import com.github.chengzhx76.util.HttpConstant;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,7 +27,7 @@ public class Response implements Serializable {
 
     private ResultItems resultItems = new ResultItems();
 
-    private List<Request> targetRequest = new ArrayList<>();
+    private List<Request> targetRequests = new ArrayList<>();
 
     private List<Request> targetMediaRequest = new ArrayList<>();
 
@@ -125,135 +124,78 @@ public class Response implements Serializable {
     }
 
     public void putField(String key, Object field) {
-        resultItems.putField(key, field);
+        resultItems.put(key, field);
     }
 
-    public List<Request> getTargetRequest() {
-        return targetRequest;
+    public List<Request> getTargetRequests() {
+        return targetRequests;
     }
 
-    public void setTargetRequest(List<Request> targetRequest) {
-        this.targetRequest = targetRequest;
+    public void setTargetRequests(List<Request> targetRequests) {
+        this.targetRequests = targetRequests;
     }
-
-    public List<Request> getTargetMediaRequest() {
-        return targetMediaRequest;
-    }
-
-    public void setTargetMediaRequest(List<Request> targetMediaRequest) {
-        this.targetMediaRequest = targetMediaRequest;
-    }
-
-    // ------------------------媒体资源添加 Start------------------------------
-
-    public void addTargetMediaRequest(List<String> targetUrls) {
-        addTargetMediaSubdirRequest(targetUrls, null);
-    }
-
-    public void addTargetMediaSubdirRequest(List<String> targetUrls, String subdires) {
-        addTargetMediaSubdirTitleRequest(targetUrls, subdires, null);
-    }
-
-    public void addTargetMediaTitleRequest(List<String> targetUrls, String title) {
-        addTargetMediaSubdirTitleRequest(targetUrls, null, title);
-    }
-
-    public void addTargetMediaSubdirTitleRequest(List<String> targetUrls, String subdires, String title) {
-        for (String url : targetUrls) {
-            addTargetMediaSubdirTitleRequest(url, subdires, title);
-        }
-    }
-
-    public void addTargetMediaRequest(String targetUrl) {
-        addTargetMediaSubdirRequest(targetUrl, null);
-    }
-
-    public void addTargetMediaTitleRequest(String targetUrl, String title) {
-        addTargetMediaSubdirTitleRequest(targetUrl, null, title);
-    }
-
-    public void addTargetMediaSubdirRequest(String targetUrl, String subdires) {
-        addTargetMediaSubdirTitleRequest(targetUrl, subdires, null);
-    }
-
-    public void addTargetMediaSubdirTitleRequest(String targetUrl, String subdires, String title) {
-        if (!StringUtils.isBlank(targetUrl)) {
-            if (!StringUtils.isBlank(subdires) && !StringUtils.isBlank(title)) {
-                addTargetMediaRequest(Request.createMediaRequest(targetUrl).setSubdires(subdires).putExtra(Constant.TITLE, title));
-            } else if (!StringUtils.isBlank(subdires)) {
-                addTargetMediaRequest(Request.createMediaRequest(targetUrl).setSubdires(subdires));
-            } else if (!StringUtils.isBlank(title)) {
-                addTargetMediaRequest(Request.createMediaRequest(targetUrl).putExtra(Constant.TITLE, title));
-            } else {
-                addTargetMediaRequest(Request.createMediaRequest(targetUrl));
-            }
-        }
-    }
-
-    // ------------------------媒体资源添加 End------------------------------
 
     // ------------------------文本源添加 Start------------------------------
-
-    public void addTargetRequest(List<String> requestUrls) {
+    public void addTargetUrls(List<String> requestUrls) {
         for (String url : requestUrls) {
-            addTargetRequest(url);
+            addTargetUrl(url);
         }
     }
 
-    public void addTargetPriorityRequest(List<String> requestUrls, long priority) {
+    public void addTargetPriorityUrls(List<String> requestUrls, long priority) {
         for (String url : requestUrls) {
-            addTargetPriorityRequest(url, priority);
+            addTargetPriorityUrl(url, priority);
         }
     }
 
-    public void addTargetExtraRequest(List<String> requestUrls, Map<String, Object> extra) {
+    public void addTargetExtraUrls(List<String> requestUrls, Map<String, Object> extra) {
         for (String url : requestUrls) {
-            addTargetExtrasRequest(url, extra);
+            addTargetExtrasUrl(url, extra);
         }
     }
 
-    public void addTargetRequest(String requestUrl) {
-        addTargetExtrasRequest(requestUrl, null);
+    public void addTargetUrl(String requestUrl) {
+        addTargetExtrasUrl(requestUrl, null);
     }
 
-    public void addTargetPriorityRequest(String requestUrl, long priority) {
-        addTargetPriorityAndExtrasRequest(requestUrl, priority, null);
+    public void addTargetPriorityUrl(String requestUrl, long priority) {
+        addTargetPriorityAndExtrasUrl(requestUrl, priority, null);
     }
 
-    public void addTargetExtrasRequest(String requestUrl, Map<String, Object> extras) {
-        addTargetPriorityAndExtrasRequest(requestUrl, 0, extras);
+    public void addTargetExtrasUrl(String requestUrl, Map<String, Object> extras) {
+        addTargetPriorityAndExtrasUrl(requestUrl, 0L, extras);
     }
 
 
-    public void addTargetPriorityAndExtrasRequest(String requestUrl, long priority, Map<String, Object> extras) {
+    public void addTargetPriorityAndExtrasUrl(String requestUrl, long priority, Map<String, Object> extras) {
         if (checkLegalUrl(requestUrl)) {
             return;
         }
         if (priority != 0L && extras != null) {
-            addTargetRequest(Request.createHtmlRequest(requestUrl).setPriority(priority).setExtra(extras));
+            addTargetRequest(Request.createHtmlGetRequest(requestUrl).setPriority(priority).setExtra(extras));
         } else if (extras != null){
-            addTargetRequest(Request.createHtmlRequest(requestUrl).setExtra(extras));
+            addTargetRequest(Request.createHtmlGetRequest(requestUrl).setExtra(extras));
         } else if (priority != 0L){
-            addTargetRequest(Request.createHtmlRequest(requestUrl).setPriority(priority));
+            addTargetRequest(Request.createHtmlGetRequest(requestUrl).setPriority(priority));
         } else {
-            addTargetRequest(Request.createHtmlRequest(requestUrl));
+            addTargetRequest(Request.createHtmlGetRequest(requestUrl));
         }
     }
 
     // ------------------------文本源添加 End------------------------------
-    /**
-     * 添加抓取的请求，可以在需要传递附加信息时使用
-     * @param request
-     */
-    private void addTargetRequest(Request request) {
-        targetRequest.add(request);
+
+    public void addTargetRequest(List<Request> requests) {
+        for (Request request : requests) {
+            addTargetRequest(request);
+        }
     }
+
     /**
      * 添加抓取的请求，可以在需要传递附加信息时使用
      * @param request
      */
-    private void addTargetMediaRequest(Request request) {
-        targetMediaRequest.add(request);
+    public void addTargetRequest(Request request) {
+        targetRequests.add(request);
     }
 
     private boolean checkLegalUrl(String addr) {
@@ -281,7 +223,7 @@ public class Response implements Serializable {
         sb.append(", headers=").append(headers);
         sb.append(", request=").append(request);
         sb.append(", resultItems=").append(resultItems);
-        sb.append(", targetRequest=").append(targetRequest);
+        sb.append(", targetRequests=").append(targetRequests);
         sb.append(", targetMediaRequest=").append(targetMediaRequest);
         sb.append('}');
         return sb.toString();

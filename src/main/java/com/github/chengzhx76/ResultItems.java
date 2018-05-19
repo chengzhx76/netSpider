@@ -24,7 +24,7 @@ public class ResultItems {
         return fields;
     }
 
-    public ResultItems putField(String key, Object value) {
+    public ResultItems put(String key, Object value) {
         fields.put(key, value);
         return this;
     }
