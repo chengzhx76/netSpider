@@ -1,7 +1,11 @@
 package com.github.chengzhx76.util;
 
+import com.github.chengzhx76.Request;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -108,6 +112,14 @@ public class UrlUtils {
         } else {
             return null;
         }
+    }
+
+    public static List<Request> convertToRequests(Collection<String> urls) {
+        List<Request> requestList = new ArrayList<Request>(urls.size());
+        for (String url : urls) {
+            requestList.add(new Request(url));
+        }
+        return requestList;
     }
 
 }

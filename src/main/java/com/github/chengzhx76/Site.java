@@ -1,9 +1,10 @@
 package com.github.chengzhx76;
 
 
-import com.github.chengzhx76.util.UrlUtils;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Desc:
@@ -18,17 +19,37 @@ public class Site {
 
     private String charset;
 
-    private List<String> startUrls = new ArrayList<>();
+    // 默认全部站点设置
+    private Map<String, String> defaultCookies = new HashMap<>();
 
-    private Map<String, String> cookies = new HashMap<>();
+    // 所有站点设置
+    private Map<String, Map<String, String>> cookies = new HashMap<>();
 
-    private int sleepTime = 3000;
+    // 头信息全局设置
+    private Map<String, String> headers = new HashMap<>();
 
+    // 全局的下载休息时间 ms
+    private long sleepTime = 3000L;
+
+    // 重试的次数
     private int retryTimes = 0;
 
+    // 循环重试次数
+    private int cycleRetryTimes = 0;
+
+    // 重试休息时间
+    private long retrySleepTime = 1000;
+
+    private int timeOut = 5000;
+
+    // 全局设置 如果有媒体资源是否选择下载
     private boolean downloadMedia = false;
 
+    // 媒体资源下载路径
     private String mediaDirectory;
+
+    // 禁止全局Cookie管理
+    private boolean disableCookieManagement = false;
 
     private static final Set<Integer> DEFAULT_STATUS_CODE_SET = new HashSet<>();
 
@@ -52,11 +73,6 @@ public class Site {
      * @return
      */
     public String getDomain() {
-        if (domain == null) {
-            if (startUrls.size() >0) {
-                domain = UrlUtils.getDomain(startUrls.get(0));
-            }
-        }
         return domain;
     }
     /**
@@ -112,26 +128,6 @@ public class Site {
     }
 
     /**
-     * 获取初始页面的地址列表
-     *
-     * @return 初始页面的地址列表
-     */
-    public List<String> getStartUrls() {
-        return startUrls;
-    }
-
-    /**
-     * 增加初始页面的地址，可反复调用此方法增加多个初始地址。
-     *
-     * @param startUrl 初始页面的地址
-     * @return this
-     */
-    public Site addStartUrls(String startUrl) {
-        this.startUrls.add(startUrl);
-        return this;
-    }
-
-    /**
      * 为这个站点添加一个cookie，可用于抓取某些需要登录访问的站点。这个cookie的域名与{@link #getDomain()}是一致的
      *
      * @param name  cookie的名称
@@ -139,16 +135,39 @@ public class Site {
      * @return this
      */
     public Site addCookie(String name, String value) {
-        cookies.put(name, value);
+        this.defaultCookies.put(name, value);
         return this;
     }
+
+    public Site addCookies(String domain, String name, String value) {
+        if (!cookies.containsKey(domain)){
+            cookies.put(domain,new HashMap<String, String>());
+        }
+        cookies.get(domain).put(name, value);
+        return this;
+    }
+
+
     /**
      * 获取已经设置的所有cookie
      *
      * @return 已经设置的所有cookie
      */
     public Map<String, String> getCookies() {
+        return defaultCookies;
+    }
+
+    public Map<String, Map<String, String>> getAllCookies() {
         return cookies;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public Site setHeaders(String name, String value) {
+        headers.put(name, value);
+        return this;
     }
 
     /**
@@ -156,7 +175,7 @@ public class Site {
      *
      * @return 两次抓取之间的间隔，单位毫秒
      */
-    public int getSleepTime() {
+    public long getSleepTime() {
         return sleepTime;
     }
 
@@ -167,7 +186,7 @@ public class Site {
      * @param sleepTime 单位毫秒
      * @return this
      */
-    public Site setSleepTime(int sleepTime) {
+    public Site setSleepTime(long sleepTime) {
         this.sleepTime = sleepTime;
         return this;
     }
@@ -188,6 +207,47 @@ public class Site {
      */
     public Site setRetryTimes(int retryTimes) {
         this.retryTimes = retryTimes;
+        return this;
+    }
+
+    public int getCycleRetryTimes() {
+        return cycleRetryTimes;
+    }
+
+    public Site setCycleRetryTimes(int cycleRetryTimes) {
+        this.cycleRetryTimes = cycleRetryTimes;
+        return this;
+    }
+
+    public long getRetrySleepTime() {
+        return retrySleepTime;
+    }
+
+    public Site setRetrySleepTime(long retrySleepTime) {
+        this.retrySleepTime = retrySleepTime;
+        return this;
+    }
+
+    public int getTimeOut() {
+        return timeOut;
+    }
+
+    public Site setTimeOut(int timeOut) {
+        this.timeOut = timeOut;
+        return this;
+    }
+
+    public boolean isDisableCookieManagement() {
+        return disableCookieManagement;
+    }
+
+    public Site setDisableCookieManagement(boolean disableCookieManagement) {
+        this.disableCookieManagement = disableCookieManagement;
+        return this;
+    }
+
+    public Site setDownloadMedia(boolean downloadMedia) {
+        this.downloadMedia = downloadMedia;
         return this;
     }
 

@@ -1,6 +1,7 @@
 package com.github.chengzhx76.download;
 
 import com.github.chengzhx76.Site;
+import org.apache.http.client.CookieStore;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.config.SocketConfig;
@@ -8,10 +9,9 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.*;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +22,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 public class HttpClientGenerator {
 	
@@ -103,22 +104,34 @@ public class HttpClientGenerator {
         SocketConfig socketConfig = socketConfigBuilder.build();
         httpClientBuilder.setDefaultSocketConfig(socketConfig);
         connectionManager.setDefaultSocketConfig(socketConfig);
-        //generateCookie(httpClientBuilder, site);
+        httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(site.getRetryTimes(), true));
+        generateCookie(httpClientBuilder, site);
         return httpClientBuilder.build();
     }
 
-    /*private void generateCookie(HttpClientBuilder httpClientBuilder, Site site) {
+    private void generateCookie(HttpClientBuilder httpClientBuilder, Site site) {
         if (site.isDisableCookieManagement()) {
             httpClientBuilder.disableCookieManagement();
             return;
         }
+
         CookieStore cookieStore = new BasicCookieStore();
+        // 主站点的Cookie信息
         for (Map.Entry<String, String> cookieEntry : site.getCookies().entrySet()) {
             BasicClientCookie cookie = new BasicClientCookie(cookieEntry.getKey(), cookieEntry.getValue());
             cookie.setDomain(site.getDomain());
             cookieStore.addCookie(cookie);
         }
+        // 其他站点Cookie信息
+        for (Map.Entry<String, Map<String, String>> domainEntry : site.getAllCookies().entrySet()) {
+            for (Map.Entry<String, String> cookieEntry : domainEntry.getValue().entrySet()) {
+                BasicClientCookie cookie = new BasicClientCookie(cookieEntry.getKey(), cookieEntry.getValue());
+                cookie.setDomain(domainEntry.getKey());
+                cookieStore.addCookie(cookie);
+            }
+        }
+
         httpClientBuilder.setDefaultCookieStore(cookieStore);
-    }*/
+    }
 
 }

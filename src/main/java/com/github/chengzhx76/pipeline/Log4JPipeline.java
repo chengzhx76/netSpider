@@ -1,7 +1,7 @@
 package com.github.chengzhx76.pipeline;
 
-import com.cheng.spider.core.ResultItems;
-import com.cheng.spider.core.Task;
+import com.github.chengzhx76.ResultItems;
+import com.github.chengzhx76.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

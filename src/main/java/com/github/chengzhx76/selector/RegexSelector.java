@@ -1,6 +1,5 @@
 package com.github.chengzhx76.selector;
 
-import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public class RegexSelector implements Selector {
     private int group = 1;
 
     public RegexSelector(String regexStr, int group) {
-        if (Strings.isNullOrEmpty(regexStr)) {
+        if (StringUtils.isBlank(regexStr)) {
             throw new IllegalArgumentException("正则表达式不能为空");
         }
         if (group <= 0) {

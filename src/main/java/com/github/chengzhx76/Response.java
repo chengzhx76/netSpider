@@ -1,36 +1,49 @@
 package com.github.chengzhx76;
 
-import com.github.chengzhx76.selector.PlainText;
 import com.github.chengzhx76.selector.Selectable;
 import com.github.chengzhx76.util.Constant;
+import com.github.chengzhx76.util.HttpConstant;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
 public class Response implements Serializable {
 
+    private Selectable url;
+
     private byte[] content;
 
     private Selectable rawText;
 
-    private Selectable url;
+    private boolean requestSuccess = true;
 
-    private boolean requestSuccess;
-
-    private int statusCode;
+    private int statusCode = HttpConstant.StatusCode.CODE_200;
 
     private Set<Cookie> cookies = new HashSet<>();
 
+    private Map<String,List<String>> headers;
+
     private Request request;
 
-    private ResultItems items = new ResultItems();
+    private ResultItems resultItems = new ResultItems();
 
     private List<Request> targetRequest = new ArrayList<>();
 
     private List<Request> targetMediaRequest = new ArrayList<>();
 
+
+    public static Response fail() {
+        Response response = new Response();
+        response.setRequestSuccess(false);
+        return response;
+    }
+
+    public Response setSkip(boolean skip) {
+        resultItems.setSkip(skip);
+        return this;
+
+    }
 
     public byte[] getContent() {
         return content;
@@ -41,11 +54,6 @@ public class Response implements Serializable {
     }
 
     public Selectable getRawText() {
-        try {
-            setRawText(new PlainText(new String(content, "UTF-8")));
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
         return rawText;
     }
 
@@ -94,14 +102,30 @@ public class Response implements Serializable {
 
     public void setRequest(Request request) {
         this.request = request;
+        this.resultItems.setRequest(request);
     }
 
-    public ResultItems getItems() {
-        return items;
+
+    public Map<String, List<String>> getHeaders() {
+        return headers;
     }
 
-    public void setItems(ResultItems items) {
-        this.items = items;
+    public Response setHeaders(Map<String, List<String>> headers) {
+        this.headers = headers;
+        return this;
+    }
+
+    public ResultItems getResultItems() {
+        return resultItems;
+    }
+
+    public Response setResultItems(ResultItems resultItems) {
+        this.resultItems = resultItems;
+        return this;
+    }
+
+    public void putField(String key, Object field) {
+        resultItems.putField(key, field);
     }
 
     public List<Request> getTargetRequest() {
@@ -238,4 +262,28 @@ public class Response implements Serializable {
                 || addr.startsWith("javascript:");
     }
 
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Response{");
+        sb.append("url=").append(url);
+        sb.append(", content=");
+        if (content == null) sb.append("null");
+        else {
+            sb.append('[');
+            for (int i = 0; i < content.length; ++i)
+                sb.append(i == 0 ? "" : ", ").append(content[i]);
+            sb.append(']');
+        }
+        sb.append(", rawText=").append(rawText);
+        sb.append(", requestSuccess=").append(requestSuccess);
+        sb.append(", statusCode=").append(statusCode);
+        sb.append(", cookies=").append(cookies);
+        sb.append(", headers=").append(headers);
+        sb.append(", request=").append(request);
+        sb.append(", resultItems=").append(resultItems);
+        sb.append(", targetRequest=").append(targetRequest);
+        sb.append(", targetMediaRequest=").append(targetMediaRequest);
+        sb.append('}');
+        return sb.toString();
+    }
 }

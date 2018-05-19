@@ -4,10 +4,11 @@ package com.github.chengzhx76.download;
 import com.github.chengzhx76.Request;
 import com.github.chengzhx76.Response;
 import com.github.chengzhx76.Site;
+import com.github.chengzhx76.selector.PlainText;
+import com.github.chengzhx76.util.HttpClientUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ public class HttpClientDownloader implements Downloader {
     private HttpClientGenerator httpClientGenerator = new HttpClientGenerator();
 
     private HttpUriRequestConverter httpUriRequestConverter = new HttpUriRequestConverter();
+
+    private boolean responseHeader = true;
 
 
     public void setHttpUriRequestConverter(HttpUriRequestConverter httpUriRequestConverter) {
@@ -54,13 +57,12 @@ public class HttpClientDownloader implements Downloader {
         CloseableHttpResponse httpResponse = null;
         CloseableHttpClient httpClient = getHttpClient(site);
         HttpClientRequestContext requestContext = httpUriRequestConverter.convert(request, site);
-        Response response = null;
+        Response response = Response.fail();
         try {
             httpResponse = httpClient.execute(requestContext.getHttpUriRequest(), requestContext.getHttpClientContext());
             response = handleResponse(httpResponse, site, request);
-            //getCookies(requestContext, request);
             onSuccess(request);
-            //logger.info("downloading page success {}", request.getOperation());
+            logger.info("downloading page success {}", request.getUrl());
             return response;
         } catch (IOException e) {
             logger.warn("download page error", e);
@@ -71,32 +73,28 @@ public class HttpClientDownloader implements Downloader {
                 //ensure the connection is released back to pool
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
             }
-            /*if (proxyProvider != null && proxy != null) {
-                proxyProvider.returnProxy(proxy, response, site);
-            }*/
         }
     }
 
+    @Override
     public void setThread(int thread) {
         httpClientGenerator.setPoolSize(thread);
     }
 
-    protected Response handleResponse(HttpResponse httpResponse, Site site, Request request) throws IOException {
+    private Response handleResponse(HttpResponse httpResponse, Site site, Request request) throws IOException {
         Response response = new Response();
         byte[] bytes = IOUtils.toByteArray(httpResponse.getEntity().getContent());
         response.setContent(bytes);
-//        response.setOperation(request.getOperation());
+        response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
+        response.setRawText(new PlainText(new String(bytes, request.getCharset() != null ? request.getCharset() : site.getCharset())));
         response.setRequestSuccess(true);
-//        response.setStatusCode(HttpConstant.StatusCode.CODE_200);
+        response.setRequest(request);
+        if (responseHeader) {
+            response.setHeaders(HttpClientUtils.convertHeaders(httpResponse.getAllHeaders()));
+        }
         return response;
     }
 
-    private void getCookies(HttpClientRequestContext requestContext, Request request) {
-        for (Cookie cookie : requestContext.getHttpClientContext().getCookieStore().getCookies()) {
-            System.out.println(cookie);
-        }
-
-    }
 
     protected void onSuccess(Request request) {
     }

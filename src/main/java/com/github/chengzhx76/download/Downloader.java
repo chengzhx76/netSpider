@@ -12,4 +12,6 @@ import com.github.chengzhx76.Site;
 public interface Downloader {
 
     Response request(Request request, Site site);
+
+    void setThread(int threadNum);
 }

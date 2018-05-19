@@ -1,7 +1,8 @@
 package com.github.chengzhx76.scheduler;
 
-import com.cheng.spider.core.Request;
-import com.cheng.spider.core.Task;
+
+import com.github.chengzhx76.Request;
+import com.github.chengzhx76.Task;
 
 import java.util.Comparator;
 import java.util.HashSet;

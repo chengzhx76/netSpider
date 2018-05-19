@@ -1,10 +1,12 @@
 package com.github.chengzhx76;
 
 
-import com.github.chengzhx76.util.Constant;
+import com.github.chengzhx76.util.Constant.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,15 +18,40 @@ public class Request implements Serializable {
 
     private static final long serialVersionUID = 2062192774891352043L;
 
+    public static final String CYCLE_TRIED_TIMES = "_cycle_tried_times";
+
     private String url;
 
+    private String method;
+
+    private HttpRequestBody requestBody;
+
+    // 下载的二级目录
     private String subdires;
 
+    // 扩展信息
     private Map<String, Object> extra;
 
+    // 优先级
     private long priority;
 
-    private String type = Constant.HTML;
+    // 类型 html,media,json
+    private String type = Type.HTML;
+
+    // 针对每次请求的头信息
+    private Map<String, String> headers = new HashMap<>();
+
+    // 针对每次请求的cookie信息
+    private List<Cookie> cookies = new ArrayList<>();
+
+    // 是否禁用Cookie管理
+    private boolean disableCookie = false;
+
+    // 该请求的编码
+    private String charset;
+
+    public Request() {
+    }
 
     public Request(String url, String type) {
         this.url = url;
@@ -40,11 +67,11 @@ public class Request implements Serializable {
     }
 
     public static Request createMediaRequest(String url) {
-        return new Request(url, Constant.MEDIA);
+        return new Request(url, Type.MEDIA);
     }
 
     public static Request createHtmlRequest(String url) {
-        return new Request(url, Constant.HTML);
+        return new Request(url, Type.HTML);
     }
 
     public String getUrl() {
@@ -99,6 +126,70 @@ public class Request implements Serializable {
 
     public String getType() {
         return type;
+    }
+
+    public Request setUrl(String url) {
+        this.url = url;
+        return this;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public Request setMethod(String method) {
+        this.method = method;
+        return this;
+    }
+
+    public HttpRequestBody getRequestBody() {
+        return requestBody;
+    }
+
+    public Request setRequestBody(HttpRequestBody requestBody) {
+        this.requestBody = requestBody;
+        return this;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public Request setCharset(String charset) {
+        this.charset = charset;
+        return this;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public Request addHeaders(String name, String value) {
+        this.headers.put(name, value);
+        return this;
+    }
+
+    public List<Cookie> getCookies() {
+        return cookies;
+    }
+
+    public Request addCookies(String name, String value) {
+        this.cookies.add(new Cookie(name, value));
+        return this;
+    }
+
+    public Request addCookies(String name, String value, String domain) {
+        this.cookies.add(new Cookie(name, value, domain));
+        return this;
+    }
+
+    public Request setDisableCookie(boolean disableCookie) {
+        this.disableCookie = disableCookie;
+        return this;
+    }
+
+    public boolean isDisableCookie() {
+        return disableCookie;
     }
 
     @Override
