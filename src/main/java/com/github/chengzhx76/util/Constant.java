@@ -11,12 +11,12 @@ public interface Constant {
 
     String ID = "id";
 
-    String TITLE = "title";
+    String MEDIA_NAME = "title";
 
     abstract class Type {
         public final static String HTML = "html";
         public final static String MEDIA = "media";
-        public final static String JSON = "json";
+        //public final static String JSON = "json";
     }
 
     abstract class Charset {

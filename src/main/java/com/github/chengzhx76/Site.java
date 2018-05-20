@@ -42,9 +42,6 @@ public class Site {
 
     private int timeOut = 5000;
 
-    // 全局设置 如果有媒体资源是否选择下载
-    private boolean downloadMedia = false;
-
     // 媒体资源下载路径
     private String mediaDirectory;
 
@@ -244,29 +241,6 @@ public class Site {
     public Site setDisableCookieManagement(boolean disableCookieManagement) {
         this.disableCookieManagement = disableCookieManagement;
         return this;
-    }
-
-    public Site setDownloadMedia(boolean downloadMedia) {
-        this.downloadMedia = downloadMedia;
-        return this;
-    }
-
-    /**
-     * 是否下载资源文件
-     * @param downloadMedia true or false
-     * @return
-     */
-    public Site isDownloadMedia(boolean downloadMedia) {
-        this.downloadMedia = downloadMedia;
-        return this;
-    }
-
-    /**
-     * 获取是否下载资源文件
-     * @return
-     */
-    public boolean getDownloadMedia() {
-        return downloadMedia;
     }
 
     /**

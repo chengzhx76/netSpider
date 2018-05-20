@@ -6,9 +6,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author code4crafter@gmail.com
@@ -98,5 +96,20 @@ public class HttpRequestBody implements Serializable {
 
     public byte[] getBody() {
         return body;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HttpRequestBody that = (HttpRequestBody) o;
+        return Arrays.equals(body, that.body) &&
+                Objects.equals(contentType, that.contentType) &&
+                Objects.equals(encoding, that.encoding);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(body, contentType, encoding);
     }
 }

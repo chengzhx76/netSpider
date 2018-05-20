@@ -1,14 +1,11 @@
 package com.github.chengzhx76;
 
 
-import com.github.chengzhx76.util.Constant.*;
-import com.github.chengzhx76.util.HttpConstant.*;
+import com.github.chengzhx76.util.Constant;
+import com.github.chengzhx76.util.HttpConstant.Method;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Desc:
@@ -36,9 +33,6 @@ public class Request implements Serializable {
     // 优先级
     private long priority;
 
-    // 类型 html,media,json
-    private String type = Type.HTML;
-
     // 针对每次请求的头信息
     private Map<String, String> headers = new HashMap<>();
 
@@ -50,6 +44,13 @@ public class Request implements Serializable {
 
     // 该请求的编码
     private String charset;
+
+    private String type = Constant.Type.HTML;
+
+    // 是否设置站点的头信息
+    private boolean addSiteHeader = true;
+    // 是否设置站点的Cookie
+    private boolean addSiteCookie = true;
 
     public Request() {
     }
@@ -68,20 +69,16 @@ public class Request implements Serializable {
         return new Request(url, method, type);
     }
 
-    public static Request createMediaRequest(String url) {
-        return createTypeRequest(url, Method.GET, Type.MEDIA);
+    public static Request createMediaGetRequest(String url) {
+        return createTypeRequest(url, Method.GET, Constant.Type.MEDIA);
     }
 
-    public static Request createHtmlGetRequest(String url) {
-        return createTypeRequest(url, Method.GET, Type.HTML);
+    public static Request createGetRequest(String url) {
+        return createTypeRequest(url, Method.GET, Constant.Type.HTML);
     }
 
-    public static Request createJsonGetRequest(String url) {
-        return createTypeRequest(url, Method.GET, Type.JSON);
-    }
-
-    public static Request createJsonPostRequest(String url) {
-        return createTypeRequest(url, Method.POST, Type.JSON);
+    public static Request createPostRequest(String url) {
+        return createTypeRequest(url, Method.POST, Constant.Type.HTML);
     }
 
     public String getUrl() {
@@ -127,15 +124,6 @@ public class Request implements Serializable {
 
     public String getSubdires() {
         return subdires;
-    }
-
-    public Request setType(String type) {
-        this.type = type;
-        return this;
-    }
-
-    public String getType() {
-        return type;
     }
 
     public Request setUrl(String url) {
@@ -202,6 +190,48 @@ public class Request implements Serializable {
         return disableCookie;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public Request setType(String type) {
+        this.type = type;
+        return this;
+    }
+
+    public boolean isAddSiteHeader() {
+        return addSiteHeader;
+    }
+
+    public Request setAddSiteHeader(boolean addSiteHeader) {
+        this.addSiteHeader = addSiteHeader;
+        return this;
+    }
+
+    public boolean isAddSiteCookie() {
+        return addSiteCookie;
+    }
+
+    public Request setAddSiteCookie(boolean addSiteCookie) {
+        this.addSiteCookie = addSiteCookie;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Request request = (Request) o;
+        return Objects.equals(url, request.url) &&
+                Objects.equals(method, request.method) &&
+                Objects.equals(requestBody, request.requestBody);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, method, requestBody);
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Request{");
@@ -209,7 +239,6 @@ public class Request implements Serializable {
         sb.append(", subdires='").append(subdires).append('\'');
         sb.append(", extra=").append(extra);
         sb.append(", priority=").append(priority);
-        sb.append(", type=").append(type);
         sb.append('}');
         return sb.toString();
     }

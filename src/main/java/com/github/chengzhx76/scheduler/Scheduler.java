@@ -23,4 +23,6 @@ public interface Scheduler {
      * @return 下一个要抓取的链接
      */
     Request poll(Task task);
+
+    int getSize();
 }

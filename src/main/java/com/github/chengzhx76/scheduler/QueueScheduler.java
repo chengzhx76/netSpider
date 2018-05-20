@@ -18,11 +18,11 @@ public class QueueScheduler implements Scheduler {
 
     private BlockingQueue<Request> queue = new LinkedBlockingDeque<>();
 
-    private Set<String> urls = new HashSet<>();
+    private Set<Integer> filter = new HashSet<>();
 
     @Override
     public synchronized void push(Request request, Task task) {
-        if (urls.add(request.getUrl())) {
+        if (filter.add(request.hashCode())) {
             queue.add(request);
         }
     }
@@ -30,5 +30,9 @@ public class QueueScheduler implements Scheduler {
     @Override
     public synchronized Request poll(Task task) {
         return queue.poll();
+    }
+
+    public int getSize() {
+        return queue.size();
     }
 }

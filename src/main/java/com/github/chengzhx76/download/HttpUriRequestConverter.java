@@ -17,7 +17,6 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.cookie.BasicClientCookie;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 public class HttpUriRequestConverter {
@@ -34,6 +33,13 @@ public class HttpUriRequestConverter {
         // 先判断全局
         if (site.isDisableCookieManagement()) {
             return httpContext;
+        }
+
+        if (!request.isAddSiteCookie()) {
+            CookieStore store = httpContext.getCookieStore();
+            if (store != null) {
+                store.clear();
+            }
         }
 
         // 在判断单个请求
@@ -68,7 +74,7 @@ public class HttpUriRequestConverter {
     private HttpUriRequest convertHttpUriRequest(Request request, Site site) {
         RequestBuilder requestBuilder = selectRequestMethod(request).setUri(request.getUrl());
 
-        if (site.getHeaders() != null) {
+        if (site.getHeaders() != null && request.isAddSiteHeader()) {
             for (Map.Entry<String, String> headerEntry : site.getHeaders().entrySet()) {
                 requestBuilder.addHeader(headerEntry.getKey(), headerEntry.getValue());
             }
@@ -114,11 +120,11 @@ public class HttpUriRequestConverter {
     private RequestBuilder addFormParams(RequestBuilder requestBuilder, Request request) {
         if (request.getRequestBody() != null) {
 
-            try {
-                System.out.println(new String(request.getRequestBody().getBody(), "utf-8"));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+            //try {
+            //    System.out.println(new String(request.getRequestBody().getBody(), "utf-8"));
+            //} catch (UnsupportedEncodingException e) {
+            //    e.printStackTrace();
+            //}
 
             ByteArrayEntity entity = new ByteArrayEntity(request.getRequestBody().getBody());
             entity.setContentType(request.getRequestBody().getContentType());

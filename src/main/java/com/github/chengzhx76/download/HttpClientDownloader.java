@@ -5,8 +5,11 @@ import com.github.chengzhx76.Request;
 import com.github.chengzhx76.Response;
 import com.github.chengzhx76.Site;
 import com.github.chengzhx76.selector.PlainText;
+import com.github.chengzhx76.util.Constant;
 import com.github.chengzhx76.util.HttpClientUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -83,12 +86,22 @@ public class HttpClientDownloader implements Downloader {
 
     private Response handleResponse(HttpResponse httpResponse, Site site, Request request) throws IOException {
         Response response = new Response();
-        byte[] bytes = IOUtils.toByteArray(httpResponse.getEntity().getContent());
-        // TODO判断是否是资源
-
-        response.setContent(bytes);
+        HttpEntity entity = httpResponse.getEntity();
+        // 判断是否是资源
+        byte[] bytes = IOUtils.toByteArray(entity.getContent());
+        response.setBytes(bytes);
+        if (!Constant.Type.MEDIA.equals(request.getType())) {
+            response.setRawText(new PlainText(new String(bytes, request.getCharset() != null ? request.getCharset() : site.getCharset())));
+        } else {
+            response.setStreaming(true);
+            String mediaName = (String) request.getExtra().get(Constant.MEDIA_NAME);
+            if (StringUtils.isNotBlank(mediaName)) {
+                response.setMediaName(mediaName);
+            }
+            // TODO 文件后缀
+            // TODO 文件名
+        }
         response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
-        response.setRawText(new PlainText(new String(bytes, request.getCharset() != null ? request.getCharset() : site.getCharset())));
         response.setRequestSuccess(true);
         response.setRequest(request);
         if (responseHeader) {

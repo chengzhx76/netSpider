@@ -11,26 +11,27 @@ public class Response implements Serializable {
 
     private Selectable url;
 
-    private byte[] content;
+    private byte[] bytes;
 
     private Selectable rawText;
 
     private boolean requestSuccess = true;
+    // 是否是流
+    private boolean streaming = false;
+    // 资源名
+    private String mediaName;
 
     private int statusCode = HttpConstant.StatusCode.CODE_200;
 
     private Set<Cookie> cookies = new HashSet<>();
 
-    private Map<String,List<String>> headers;
+    private Map<String, List<String>> headers;
 
     private Request request;
 
     private ResultItems resultItems = new ResultItems();
 
     private List<Request> targetRequests = new ArrayList<>();
-
-    private List<Request> targetMediaRequest = new ArrayList<>();
-
 
     public static Response fail() {
         Response response = new Response();
@@ -44,12 +45,12 @@ public class Response implements Serializable {
 
     }
 
-    public byte[] getContent() {
-        return content;
+    public byte[] getBytes() {
+        return bytes;
     }
 
-    public void setContent(byte[] content) {
-        this.content = content;
+    public void setBytes(byte[] bytes) {
+        this.bytes = bytes;
     }
 
     public Selectable getRawText() {
@@ -66,6 +67,24 @@ public class Response implements Serializable {
 
     public Response setRequestSuccess(boolean requestSuccess) {
         this.requestSuccess = requestSuccess;
+        return this;
+    }
+
+    public boolean isStreaming() {
+        return streaming;
+    }
+
+    public Response setStreaming(boolean streaming) {
+        this.streaming = streaming;
+        return this;
+    }
+
+    public String getMediaName() {
+        return mediaName;
+    }
+
+    public Response setMediaName(String mediaName) {
+        this.mediaName = mediaName;
         return this;
     }
 
@@ -172,13 +191,13 @@ public class Response implements Serializable {
             return;
         }
         if (priority != 0L && extras != null) {
-            addTargetRequest(Request.createHtmlGetRequest(requestUrl).setPriority(priority).setExtra(extras));
+            addTargetRequest(Request.createGetRequest(requestUrl).setPriority(priority).setExtra(extras));
         } else if (extras != null){
-            addTargetRequest(Request.createHtmlGetRequest(requestUrl).setExtra(extras));
+            addTargetRequest(Request.createGetRequest(requestUrl).setExtra(extras));
         } else if (priority != 0L){
-            addTargetRequest(Request.createHtmlGetRequest(requestUrl).setPriority(priority));
+            addTargetRequest(Request.createGetRequest(requestUrl).setPriority(priority));
         } else {
-            addTargetRequest(Request.createHtmlGetRequest(requestUrl));
+            addTargetRequest(Request.createGetRequest(requestUrl));
         }
     }
 
@@ -209,11 +228,11 @@ public class Response implements Serializable {
         final StringBuffer sb = new StringBuffer("Response{");
         sb.append("url=").append(url);
         sb.append(", content=");
-        if (content == null) sb.append("null");
+        if (bytes == null) sb.append("null");
         else {
             sb.append('[');
-            for (int i = 0; i < content.length; ++i)
-                sb.append(i == 0 ? "" : ", ").append(content[i]);
+            for (int i = 0; i < bytes.length; ++i)
+                sb.append(i == 0 ? "" : ", ").append(bytes[i]);
             sb.append(']');
         }
         sb.append(", rawText=").append(rawText);
@@ -224,7 +243,6 @@ public class Response implements Serializable {
         sb.append(", request=").append(request);
         sb.append(", resultItems=").append(resultItems);
         sb.append(", targetRequests=").append(targetRequests);
-        sb.append(", targetMediaRequest=").append(targetMediaRequest);
         sb.append('}');
         return sb.toString();
     }

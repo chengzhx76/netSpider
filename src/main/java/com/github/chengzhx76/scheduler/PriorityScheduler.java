@@ -36,11 +36,11 @@ public class PriorityScheduler implements Scheduler {
         }
     });
 
-    private Set<String> urls = new HashSet<>();
+    private Set<Integer> filter = new HashSet<>();
 
     @Override
     public void push(Request request, Task task) {
-        if (urls.add(request.getUrl())) {
+        if (filter.add(request.hashCode())) {
             if (request.getPriority() == 0L) {
                 noPriorityQueue.add(request);
             }else if (request.getPriority() > 0L) {
@@ -62,6 +62,11 @@ public class PriorityScheduler implements Scheduler {
             return request;
         }
         return priorityQueuePlus.poll();
+    }
+
+    @Override
+    public int getSize() {
+        return noPriorityQueue.size() + priorityQueuePlus.size() + priorityQueueMinus.size();
     }
 
     private int compareLong(long o1, long o2) {

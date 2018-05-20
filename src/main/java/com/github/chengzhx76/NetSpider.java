@@ -1,6 +1,5 @@
 package com.github.chengzhx76;
 
-import com.alibaba.fastjson.JSON;
 import com.github.chengzhx76.download.Downloader;
 import com.github.chengzhx76.download.HttpClientDownloader;
 import com.github.chengzhx76.pipeline.ConsolePipeline;
@@ -276,6 +275,7 @@ public class NetSpider implements Runnable, Task {
                     }
                 });
             }
+            LOG.info("队列剩余数--> "+scheduler.getSize());
         }
         state.set(STATE_STOPPED);
         // release some resources
@@ -350,11 +350,9 @@ public class NetSpider implements Runnable, Task {
     }
 
     private void onError(Request request) {
-        System.out.println("onError");
     }
 
     private void onSuccess(Request request) {
-        System.out.println("onSuccess");
     }
 
     private void waitNewUrl() {

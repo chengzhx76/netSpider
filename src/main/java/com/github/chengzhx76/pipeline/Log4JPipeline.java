@@ -19,7 +19,7 @@ public class Log4JPipeline implements Pipeline {
     @Override
     public void process(ResultItems items, Task task) {
         log.info("------------------------------------------------");
-        log.info("get "+ items.getRequest().getType() +": "+items.getRequest().getUrl());
+        log.info("get "+items.getRequest().getUrl());
         for (Map.Entry<String, Object> entry : items.getAll().entrySet()) {
             log.info(entry.getKey()+"："+entry.getValue());
         }
