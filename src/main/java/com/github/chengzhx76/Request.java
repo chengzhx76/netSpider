@@ -28,7 +28,7 @@ public class Request implements Serializable {
     private String subdires;
 
     // 扩展信息
-    private Map<String, Object> extra;
+    private Map<String, Object> extra = new HashMap<>();
 
     // 优先级
     private long priority;

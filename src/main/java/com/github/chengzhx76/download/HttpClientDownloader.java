@@ -7,6 +7,7 @@ import com.github.chengzhx76.Site;
 import com.github.chengzhx76.selector.PlainText;
 import com.github.chengzhx76.util.Constant;
 import com.github.chengzhx76.util.HttpClientUtils;
+import com.github.chengzhx76.util.UrlUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -85,6 +86,11 @@ public class HttpClientDownloader implements Downloader {
     }
 
     private Response handleResponse(HttpResponse httpResponse, Site site, Request request) throws IOException {
+
+        //System.out.println(JSON.toJSONString(site));
+        //System.out.println(JSON.toJSONString(request));
+        //System.out.println(new String(request.getRequestBody().getBody()));
+
         Response response = new Response();
         HttpEntity entity = httpResponse.getEntity();
         // 判断是否是资源
@@ -94,12 +100,14 @@ public class HttpClientDownloader implements Downloader {
             response.setRawText(new PlainText(new String(bytes, request.getCharset() != null ? request.getCharset() : site.getCharset())));
         } else {
             response.setStreaming(true);
-            String mediaName = (String) request.getExtra().get(Constant.MEDIA_NAME);
-            if (StringUtils.isNotBlank(mediaName)) {
-                response.setMediaName(mediaName);
+            String mediaFileName = UrlUtils.getMediaFileName(request.getUrl());
+            if (StringUtils.isNotBlank(mediaFileName)) {
+                response.setMediaFileName(mediaFileName);
             }
-            // TODO 文件后缀
-            // TODO 文件名
+        }
+        String mediaName = (String) request.getExtra().get(Constant.MEDIA_NAME);
+        if (StringUtils.isNotBlank(mediaName)) {
+            response.setMediaName(mediaName);
         }
         response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
         response.setRequestSuccess(true);

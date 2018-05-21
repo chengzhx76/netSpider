@@ -20,14 +20,14 @@ public class Response implements Serializable {
     private boolean streaming = false;
     // 资源名
     private String mediaName;
+    // 资源文件名
+    private String mediaFileName;
 
     private int statusCode = HttpConstant.StatusCode.CODE_200;
 
     private Set<Cookie> cookies = new HashSet<>();
 
     private Map<String, List<String>> headers;
-
-    private Request request;
 
     private ResultItems resultItems = new ResultItems();
 
@@ -88,6 +88,15 @@ public class Response implements Serializable {
         return this;
     }
 
+    public String getMediaFileName() {
+        return mediaFileName;
+    }
+
+    public Response setMediaFileName(String mediaFileName) {
+        this.mediaFileName = mediaFileName;
+        return this;
+    }
+
     public int getStatusCode() {
         return statusCode;
     }
@@ -115,11 +124,10 @@ public class Response implements Serializable {
     }
 
     public Request getRequest() {
-        return request;
+        return resultItems.getRequest();
     }
 
     public void setRequest(Request request) {
-        this.request = request;
         this.resultItems.setRequest(request);
     }
 
@@ -240,7 +248,6 @@ public class Response implements Serializable {
         sb.append(", statusCode=").append(statusCode);
         sb.append(", cookies=").append(cookies);
         sb.append(", headers=").append(headers);
-        sb.append(", request=").append(request);
         sb.append(", resultItems=").append(resultItems);
         sb.append(", targetRequests=").append(targetRequests);
         sb.append('}');

@@ -122,4 +122,9 @@ public class UrlUtils {
         return requestList;
     }
 
+    public static String getMediaFileName(String url) {
+        return url.substring(url.lastIndexOf("/") + 1, url.length());
+    }
+
+
 }
