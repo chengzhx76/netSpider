@@ -79,15 +79,6 @@ public class Response implements Serializable {
         return this;
     }
 
-    public String getMediaName() {
-        return mediaName;
-    }
-
-    public Response setMediaName(String mediaName) {
-        this.mediaName = mediaName;
-        return this;
-    }
-
     public String getMediaFileName() {
         return mediaFileName;
     }

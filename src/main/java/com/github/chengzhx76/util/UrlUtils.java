@@ -125,6 +125,12 @@ public class UrlUtils {
     public static String getMediaFileName(String url) {
         return url.substring(url.lastIndexOf("/") + 1, url.length());
     }
+    public static String getPreUrl(String url) {
+        return url.substring(0, url.lastIndexOf("/") + 1);
+    }
 
+    public static void main(String[] args) {
+        System.out.println(getPreUrl("https://xx.xx.org/media/video/17/ae/17af9f0d61ff9df13b26f299082d81ae/sd/1.jpg"));
+    }
 
 }

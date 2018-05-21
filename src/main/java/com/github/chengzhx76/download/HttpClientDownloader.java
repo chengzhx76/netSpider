@@ -105,10 +105,6 @@ public class HttpClientDownloader implements Downloader {
                 response.setMediaFileName(mediaFileName);
             }
         }
-        String mediaName = (String) request.getExtra().get(Constant.MEDIA_NAME);
-        if (StringUtils.isNotBlank(mediaName)) {
-            response.setMediaName(mediaName);
-        }
         response.setStatusCode(httpResponse.getStatusLine().getStatusCode());
         response.setRequestSuccess(true);
         response.setRequest(request);
