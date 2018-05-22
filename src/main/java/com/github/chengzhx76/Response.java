@@ -18,8 +18,6 @@ public class Response implements Serializable {
     private boolean requestSuccess = true;
     // 是否是流
     private boolean streaming = false;
-    // 资源名
-    private String mediaName;
     // 资源文件名
     private String mediaFileName;
 
