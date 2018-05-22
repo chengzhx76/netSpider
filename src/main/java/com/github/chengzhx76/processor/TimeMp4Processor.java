@@ -28,6 +28,8 @@ public class TimeMp4Processor implements Processor {
 
     //private long priority = 1L;
 
+    private final static int COURSE = 12;
+
     @Override
     public void process(Response response) {
         try {
@@ -43,7 +45,7 @@ public class TimeMp4Processor implements Processor {
                         List<Request> requests = new ArrayList<>();
                         //for (int i = 0; i < sectionList.size(); i++) {
                         //    JSONObject section = sectionList.getJSONObject(i);
-                            JSONObject section = sectionList.getJSONObject(0); // 0 标识第一课 1 标识第二课
+                            JSONObject section = sectionList.getJSONObject(COURSE - 1); // 0 标识第一课 1 标识第二课
                             // 2.解释资源
                             String videoMediaJson = section.getString("video_media").replaceAll("\\\\", "");
                             String title = section.getString("article_title");
@@ -53,12 +55,11 @@ public class TimeMp4Processor implements Processor {
                             String url = sd.getString("url");
                             Request request = Request.createGetRequest(url)
                                     .putExtra(Constant.MEDIA_NAME, title)
-                                    .putExtra("preUrl", UrlUtils.getPreUrl(url))
+                                    .setSubdires(title.substring(0, 2)+"-"+title.substring(5).trim())
                                     .setAddSiteCookie(false)
                                     .setAddSiteHeader(false);
 
-                            response.putField("标题", title);
-                            response.putField("MP4路径", url);
+                            response.putField("下载信息", title + "-" + url);
 
                             requests.add(request);
                         //}
@@ -71,7 +72,7 @@ public class TimeMp4Processor implements Processor {
                     List<Request> requests = new ArrayList<>();
                     for (String line : results) {
                         if (StringUtils.isNotBlank(line) && !line.startsWith("#")) {
-                            Request request = Request.createMediaGetRequest(response.getRequest().getExtra("preUrl")+line)
+                            Request request = Request.createMediaGetRequest(UrlUtils.getPreUrl(response.getRequest().getUrl())+line)
                                     .putExtra(Constant.MEDIA_NAME, response.getRequest().getExtra(Constant.MEDIA_NAME))
                                     .setSubdires(response.getRequest().getSubdires())
                                     .setAddSiteCookie(false) // 二级目录
@@ -103,25 +104,28 @@ public class TimeMp4Processor implements Processor {
                     .setDomain("time.geekbang.org")
                     .setUserAgent(HttpConstant.UserAgent.CHROME)
                     .setCharset(Constant.Charset.UTF_8)
-                    .addCookie("GCID", "0c0d8a0-6ad9cb7-9448e40-18da930")
-                    .addCookie("SERVERID", "97796d411bb56cf20a5612997f113254|1526875814|1526875811")
+                    .addCookie("GCID", "-")
+                    .addCookie("GCESS", "-")
+                    .addCookie("SERVERID", "|")
                     .setHeaders(Header.ACCEPT, HeaderValue.APPLICATION_JSON_TEXT)
                     .setHeaders(Header.ACCEPT_ENCODING, HeaderValue.ENCODING)
                     .setHeaders(Header.ACCEPT_LANGUAGE, HeaderValue.LANGUAGE)
                     .setHeaders(Header.CONNECTION, HeaderValue.KEEP_ALIVE)
                     .setHeaders(Header.HOST, "time.geekbang.org")
                     .setHeaders(Header.ORIGIN, "https://time.geekbang.org")
-                    .setHeaders(Header.REFERER, "https://time.geekbang.org/course/detail/66-2184")
+                    .setHeaders(Header.REFERER, "https://time.geekbang.org/course/detail/84-6932")
                     .setSleepTime(1000)
                     .setTimeOut(5 * 60 * 1000)
-                    .setMediaDirectory("d:\\time\\");
+                    .setMediaDirectory("d:\\time\\160讲\\");
         }
         return site;
     }
 
     public static void main(String[] args) {
         Request request = Request.createPostRequest("https://time.geekbang.org/serv/v1/column/articles")
-                .setRequestBody(HttpRequestBody.json("{\"cid\":\"66\",\"size\":100,\"prev\":0,\"order\":\"earliest\"}", Constant.Charset.UTF_8));
+                //.setRequestBody(HttpRequestBody.json("{\"cid\":\"66\",\"size\":100,\"prev\":0,\"order\":\"earliest\"}", Constant.Charset.UTF_8)); // 核心20讲
+                .setRequestBody(HttpRequestBody.json("{\"cid\":\"84\",\"size\":100,\"prev\":0,\"order\":\"earliest\"}", Constant.Charset.UTF_8)); // 核心160讲
+
         NetSpider.create(new TimeMp4Processor()).startRequest(request).start();
     }
 }
